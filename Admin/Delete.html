@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        select {
+            height: 120px; /* Adjust for multiple selection */
+        }
+        button {
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #ff4d4d;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+        .refresh-btn {
+            background-color: #007bff;
+        }
+        .refresh-btn:hover {
+            background-color: #0056b3;
+        }
+        #selectedNames, #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="container">
+        <h2>Select Users to Delete</h2>
+        <select id="userList" multiple onchange="showSelectedNames()">
+            <option value="">Loading users...</option>
+        </select>
+        <p id="selectedNames"></p>
+        <button class="refresh-btn" onclick="fetchUsers()">Refresh Users</button>
+        <button class="delete-btn" onclick="deleteUsers()">Delete Selected Users</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const apiKey = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw";
+        const tableId = "444317";
+        const apiUrl = `https://api.baserow.io/api/database/rows/table/${tableId}/?user_field_names=true`;
+
+        let usersData = []; // Store users for quick access
+
+        async function fetchUsers() {
+            const userList = document.getElementById("userList");
+            const message = document.getElementById("message");
+            const selectedNames = document.getElementById("selectedNames");
+
+            userList.innerHTML = '<option value="">Loading...</option>';
+            message.textContent = "";
+            selectedNames.textContent = "";
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: { Authorization: `Token ${apiKey}` }
+                });
+                const data = await response.json();
+
+                usersData = data.results; // Store fetched data
+
+                userList.innerHTML = "";
+                if (usersData.length === 0) {
+                    message.textContent = "No users found.";
+                    message.style.color = "red";
+                    return;
+                }
+
+                usersData.forEach(row => {
+                    if (row["User"] && row["Name"]) {
+                        let option = document.createElement("option");
+                        option.value = row.id; // Store row ID for deletion
+                        option.textContent = `${row["User"]} (${row["Name"]})`;
+                        option.dataset.name = row["Name"]; // Store name in dataset
+                        userList.appendChild(option);
+                    }
+                });
+
+                message.textContent = "Users loaded successfully.";
+                message.style.color = "green";
+            } catch (error) {
+                message.textContent = "Error fetching users: " + error.message;
+                message.style.color = "red";
+            }
+        }
+
+        function showSelectedNames() {
+            const userList = document.getElementById("userList");
+            const selectedNames = document.getElementById("selectedNames");
+
+            const selectedOptions = Array.from(userList.selectedOptions);
+            if (selectedOptions.length > 0) {
+                selectedNames.textContent = "Selected Names: " + selectedOptions.map(option => option.dataset.name).join(", ");
+                selectedNames.style.color = "blue";
+            } else {
+                selectedNames.textContent = "";
+            }
+        }
+
+        async function deleteUsers() {
+            const userList = document.getElementById("userList");
+            const message = document.getElementById("message");
+            const selectedOptions = Array.from(userList.selectedOptions);
+
+            if (selectedOptions.length === 0) {
+                message.textContent = "Please select users to delete.";
+                message.style.color = "red";
+                return;
+            }
+
+            const deletePromises = selectedOptions.map(async (option) => {
+                const deleteUrl = `https://api.baserow.io/api/database/rows/table/${tableId}/${option.value}/`;
+                return fetch(deleteUrl, {
+                    method: "DELETE",
+                    headers: { Authorization: `Token ${apiKey}` }
+                });
+            });
+
+            try {
+                const results = await Promise.all(deletePromises);
+                const allDeleted = results.every(response => response.ok);
+
+                if (allDeleted) {
+                    message.textContent = "Users deleted successfully!";
+                    message.style.color = "green";
+                } else {
+                    message.textContent = "Some users failed to delete.";
+                    message.style.color = "red";
+                }
+                fetchUsers(); // Refresh the user list after deletion
+            } catch (error) {
+                message.textContent = "Error deleting users: " + error.message;
+                message.style.color = "red";
+            }
+        }
+
+        // Fetch users on page load
+        fetchUsers();
+    </script>
+</body>
+</html>

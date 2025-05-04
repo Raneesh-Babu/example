@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        /* Button Styling */
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #a71d2a;
+        }
+
+        /* Table Styling */
+        .table-container {
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Search Bar */
+        #search {
+            width: 50%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            #search {
+                width: 90%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <h2>Manage Students</h2>
+
+    <!-- Search Bar -->
+    <input type="text" id="search" placeholder="Search students by name or user..." onkeyup="filterStudents()">
+
+    <!-- Action Buttons -->
+    <div>
+        <button class="btn" onclick="selectAll(true)">Select All</button>
+        <button class="btn btn-danger" onclick="selectAll(false)">Unselect All</button>
+        <button class="btn" onclick="updateField('field_3449547', 'A')">Set Block: A</button>
+        <button class="btn btn-danger" onclick="updateField('field_3449547', 'B')">Set Block: B</button>
+        <button class="btn" onclick="updateField('field_3461737', 'P')">Set Permit: P</button>
+        <button class="btn btn-danger" onclick="updateField('field_3461737', 'N')">Set Permit: N</button>
+    </div>
+
+    <!-- Student Table -->
+    <div class="table-container">
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Name</th>
+                    <th>User</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_KEY = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw";
+        const TABLE_ID = "444317";
+        const BASE_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`;
+
+        let previousData = [];
+
+        // Fetch students from Baserow
+        async function fetchStudents() {
+            try {
+                const response = await fetch(BASE_URL, {
+                    headers: { Authorization: `Token ${API_KEY}` }
+                });
+                const data = await response.json();
+
+                if (JSON.stringify(data.results) !== JSON.stringify(previousData)) {
+                    previousData = data.results;
+                    populateTable(data.results);
+                }
+            } catch (error) {
+                console.error("Error fetching students:", error);
+            }
+        }
+
+        // Populate student table
+        function populateTable(students) {
+            const tbody = document.querySelector("#studentTable tbody");
+            tbody.innerHTML = "";
+
+            students.forEach(student => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><input type="checkbox" value="${student.id}" class="studentCheckbox"></td>
+                    <td>${student.field_3448072}</td>
+                    <td>${student.field_3449365}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Select or unselect all checkboxes
+        function selectAll(select) {
+            document.querySelectorAll(".studentCheckbox").forEach(checkbox => {
+                checkbox.checked = select;
+            });
+        }
+
+        // Update field in Baserow
+        async function updateField(fieldId, value) {
+            const selectedIds = [...document.querySelectorAll(".studentCheckbox:checked")]
+                .map(checkbox => checkbox.value);
+
+            if (selectedIds.length === 0) {
+                alert("No students selected!");
+                return;
+            }
+
+            for (const id of selectedIds) {
+                try {
+                    await fetch(`${BASE_URL}${id}/`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Token ${API_KEY}`
+                        },
+                        body: JSON.stringify({ [fieldId]: value })
+                    });
+                } catch (error) {
+                    console.error(`Error updating record ${id}:`, error);
+                }
+            }
+            alert("Update successful!");
+        }
+
+        // Search and filter students
+        function filterStudents() {
+            let input = document.getElementById("search").value.toLowerCase();
+            let rows = document.querySelectorAll("#studentTable tbody tr");
+
+            rows.forEach(row => {
+                let name = row.cells[1].textContent.toLowerCase();
+                let user = row.cells[2].textContent.toLowerCase();
+
+                if (name.includes(input) || user.includes(input)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // Load students on page load
+        fetchStudents();
+        
+        // Refresh student list every 0.5 seconds
+        setInterval(fetchStudents, 500);
+    </script>
+</body>
+</html>

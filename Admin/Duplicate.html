@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate Entry Checker</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            text-align: center;
+            padding: 10px;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        /* Table Container */
+        .table-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            table-layout: fixed;
+        }
+
+        thead {
+            background: #6200ea;
+            color: white;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr.duplicate {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            margin-top: 10px;
+        }
+
+        button {
+            background: #6200ea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #4b00b0;
+        }
+
+        .remove-btn {
+            background: #d32f2f;
+        }
+
+        .remove-btn:hover {
+            background: #b71c1c;
+        }
+
+        .delete-all-btn {
+            background: #ff0000;
+        }
+
+        .delete-all-btn:hover {
+            background: #cc0000;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+    <h2>📌 Duplicate Entry Checker</h2>
+
+    <div class="action-buttons">
+        <button onclick="copyData(false)">📋 Copy All</button>
+        <button onclick="copyData(true)">📋 Copy Duplicates Only</button>
+        <button class="delete-all-btn" onclick="deleteAllEntries()">🗑 Delete All Entries</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Mark</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="data-table"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = "https://api.baserow.io/api/database/rows/table/444864/?user_field_names=true";
+        const API_KEY = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw";
+        let records = [];
+
+        async function fetchData() {
+            try {
+                const response = await fetch(API_URL, {
+                    headers: { Authorization: `Token ${API_KEY}` }
+                });
+                const data = await response.json();
+                records = data.results;
+                displayData(records);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        function displayData(data) {
+            const tableBody = document.getElementById("data-table");
+            tableBody.innerHTML = "";
+
+            let nameCount = {};
+            data.forEach(record => {
+                let name = record["Name"];
+                nameCount[name] = (nameCount[name] || 0) + 1;
+            });
+
+            data.forEach(record => {
+                let isDuplicate = nameCount[record["Name"]] > 1;
+                let row = document.createElement("tr");
+                row.className = isDuplicate ? "duplicate" : "";
+
+                row.innerHTML = `
+                    <td>${record["Name"]}</td>
+                    <td>${record["Mark"]}</td>
+                    <td>
+                        <button class="remove-btn" onclick="removeEntry(${record.id})">❌ Remove</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function removeEntry(id) {
+            if (!confirm("Are you sure you want to delete this entry?")) return;
+            try {
+                await fetch(`https://api.baserow.io/api/database/rows/table/444864/${id}/`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Token ${API_KEY}` }
+                });
+                alert("Entry removed successfully!");
+                fetchData();
+            } catch (error) {
+                console.error("Error deleting entry:", error);
+            }
+        }
+
+        async function deleteAllEntries() {
+            if (!confirm("⚠ Are you sure you want to delete ALL entries? This cannot be undone!")) return;
+
+            try {
+                for (const record of records) {
+                    await fetch(`https://api.baserow.io/api/database/rows/table/444864/${record.id}/`, {
+                        method: "DELETE",
+                        headers: { Authorization: `Token ${API_KEY}` }
+                    });
+                }
+                alert("All entries deleted successfully!");
+                fetchData();
+            } catch (error) {
+                console.error("Error deleting all entries:", error);
+            }
+        }
+
+        function copyData(onlyDuplicates) {
+            let text = "";
+            const rows = document.querySelectorAll("#data-table tr");
+
+            rows.forEach(row => {
+                const name = row.cells[0].innerText;
+                const mark = row.cells[1].innerText;
+                const isDuplicate = row.classList.contains("duplicate");
+
+                if (!onlyDuplicates || isDuplicate) {
+                    text += `${name}: ${mark}\n`;
+                }
+            });
+
+            if (text === "") {
+                alert("No duplicate entries found!");
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied successfully!");
+            }).catch(err => {
+                console.error("Failed to copy: ", err);
+            });
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
