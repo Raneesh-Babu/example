@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Sign Up</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container h2 { margin-bottom: 15px; color: #333; font-weight: 600; }
+
+        .input-group {
+            position: relative;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            padding-left: 45px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.3s ease-in-out;
+            display: block;
+        }
+
+        .input-group input:focus {
+            border-color: #6e8efb;
+            box-shadow: 0px 0px 8px rgba(110, 142, 251, 0.5);
+            outline: none;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #888;
+        }
+
+        /* Password Eye Icon */
+        .input-group .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        input[type="password"] {
+            -webkit-text-security: disc;
+            font-size: 18px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #5c7cfb, #925bd1);
+            transform: scale(1.05);
+        }
+
+        .alert {
+            display: none;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+
+    </style>
+</div>
+
+    <div class="form-container">
+        <h2>Create an Account</h2>
+
+        <div class="alert error" id="error-msg"></div>
+        <div class="alert success" id="success-msg"></div>
+
+        <form id="signupForm">
+            <div class="input-group">
+                <i>👤</i>
+                <input type="text" id="name" placeholder="Full Name" required>
+            </div>
+            <div class="input-group">
+                <i>🔑</i>
+                <input type="text" id="username" placeholder="Generating..." readonly required>
+            </div>
+            <div class="input-group">
+                <i>🔒</i>
+                <input type="password" id="oasis" placeholder="Enter your Password" required autocomplete="off">
+                <span class="eye-icon" onclick="togglePassword('oasis')">👁️</span>
+            </div>
+            <div class="input-group">
+                <i>🔒</i>
+                <input type="password" id="oasisConfirm" placeholder="Re-enter Password" required autocomplete="off">
+                <span class="eye-icon" onclick="togglePassword('oasisConfirm')">👁️</span>
+            </div>
+            <button type="submit" class="submit-btn">Register</button>
+        </form>
+    </div>
+
+    <script>
+        const API_KEY = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw";
+        const TABLE_ID = "444317";
+        const BASEROW_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/?user_field_names=true`;
+
+        async function fetchNextUsername() {
+            try {
+                let response = await fetch(BASEROW_URL, { headers: { Authorization: `Token ${API_KEY}` } });
+                let data = await response.json();
+
+                let usernames = data.results
+                    .map(user => user["User"])
+                    .filter(username => /^HSB\d{3}$/.test(username))
+                    .map(username => parseInt(username.substring(3)))
+                    .sort((a, b) => b - a);
+
+                let nextNumber = usernames.length > 0 ? usernames[0] + 1 : 1;
+                let nextUsername = `HSB${String(nextNumber).padStart(3, "0")}`;
+
+                let usernameField = document.getElementById("username");
+                if (usernameField.value !== nextUsername) {
+                    usernameField.value = nextUsername;
+                }
+            } catch (error) {
+                console.error("Error fetching usernames:", error);
+            }
+        }
+
+        setInterval(fetchNextUsername, 100);
+        document.addEventListener("DOMContentLoaded", fetchNextUsername);
+
+        document.getElementById("signupForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            let name = document.getElementById("name").value.trim();
+            let username = document.getElementById("username").value.trim();
+            let oasis = document.getElementById("oasis").value.trim();
+            let oasisConfirm = document.getElementById("oasisConfirm").value.trim();
+            let errorMsg = document.getElementById("error-msg");
+            let successMsg = document.getElementById("success-msg");
+
+            if (oasis !== oasisConfirm) {
+                showMessage(errorMsg, "Oasis IDs do not match!", "error");
+                return;
+            }
+
+            let newUser = {
+                "Name": name,
+                "User": username,
+                "Oasis": oasis,
+                "Block": "B",
+                "Msg": "Please Verify your account"
+            };
+
+            await fetch(BASEROW_URL, {
+                method: "POST",
+                headers: { "Authorization": `Token ${API_KEY}`, "Content-Type": "application/json" },
+                body: JSON.stringify(newUser)
+            });
+
+            sendWhatsAppMessage(name, username);
+            showMessage(successMsg, "Registration successful! Redirecting...", "success");
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+
+        function sendWhatsAppMessage(name, username) {
+            let message = `New Registration:\nName: ${name}\nUsername: ${username}`;
+            window.open(`https://wa.me/918089423972?text=${encodeURIComponent(message)}`, "_blank");
+        }
+
+        function togglePassword(id) {
+            let input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function showMessage(element, message, type) {
+            element.innerText = message;
+            element.classList.add(type);
+            element.style.display = "block";
+            setTimeout(() => { element.style.display = "none"; }, 3000);
+        }
+    </script>
+
+                       
+</html>
