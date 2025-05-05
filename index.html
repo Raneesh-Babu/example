@@ -1,522 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Exam Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HSB Club – Fun Learning Community</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #ff9966, #ff5e62);
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    :root {
+      --primary: #ff6b6b;
+      --secondary: #4ecdc4;
+      --accent: #675103;
+      --background: #fdf6fd;
+      --text: #333;
+    }
+
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .login-container {
+    body {
+      font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    header {
       background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-      width: 350px;
-      text-align: left;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    h2 {
-      text-align: center;
-      color: #ff5e62;
-      font-size: 24px;
-      transition: 0.3s;
-    }
-
-    label {
-      font-size: 14px;
+    .logo {
+      font-size: 2rem;
       font-weight: bold;
-      color: #555;
-      display: block;
-      margin-top: 10px;
+      color: var(--primary);
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+    nav {
+      display: flex;
+      align-items: center;
     }
 
-    button {
-      width: 100%;
-      background-color: #ff5e62;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #d43f51;
-    }
-
-    .error,
-    .success {
-      font-size: 14px;
-      margin-top: 10px;
-      text-align: center;
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: var(--primary);
       font-weight: bold;
+      font-size: 1rem;
+      position: relative;
     }
 
-    .error {
-      color: red;
+    nav a:hover {
+      color: var(--secondary);
     }
 
-    .success {
-      color: green;
-    }
-
-    .leaderboard-link {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 16px;
+    .menu-toggle {
       display: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--primary);
     }
 
-    .leaderboard-link a {
-      color: #ff5e62;
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      color: #2d3436;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      color: #444;
+    }
+
+    .hero .highlight {
+      color: var(--secondary);
+      font-weight: bold;
+    }
+
+    .buttons a {
+      display: inline-block;
+      margin: 15px 10px;
+      padding: 12px 24px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 30px;
       text-decoration: none;
       font-weight: bold;
+      transition: 0.3s ease;
     }
 
-    .leaderboard-link a:hover {
-      text-decoration: underline;
+    .buttons a:hover {
+      background-color: var(--secondary);
     }
+
+    .whatsapp-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .whatsapp-btn:hover {
+      background-color: #128c7e;
+    }
+
+    section {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    section h2 {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+
+    .rules {
+      display: grid;
+      gap: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .rule {
+      background: white;
+      padding: 20px;
+      border-left: 8px solid var(--accent);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .rule:hover {
+      transform: translateY(-5px);
+    }
+
+    .rule h3 {
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      color: var(--secondary);
+    }
+
+    .rule p {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .countdown {
+      text-align: center;
+      background: var(--secondary);
+      padding: 20px;
+      color: white;
+      font-size: 1.5rem;
+      margin-top: 40px;
+      border-radius: 10px;
+    }
+
+    footer {
+      background: white;
+      text-align: center;
+      padding: 15px;
+      color: #777;
+      font-size: 0.9rem;
+      margin-top: 60px;
+    }
+
+    .quiz-section {
+      background-color: #f1f2f6;
+      padding: 40px 0;
+      text-align: center;
+      margin-top: 50px;
+      border-radius: 10px;
+    }
+
+    .quiz-button {
+      padding: 15px 30px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .quiz-button:hover {
+      background-color: var(--secondary);
+    }
+
+    .benefits {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+
+    .benefit {
+      width: 30%;
+      padding: 20px;
+      background-color: var(--accent);
+      color: white;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        flex-direction: column;
+        background-color: white;
+        position: absolute;
+        top: 70px;
+        right: 0;
+        width: 100%;
+      }
+
+      nav.active {
+        display: flex;
+      }
+
+      nav a {
+        margin: 10px;
+        padding: 10px;
+        border-top: 1px solid #eee;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .benefits {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .benefit {
+        width: 80%;
+        margin-bottom: 20px;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    
   </style>
-  <script>
-    const REDIRECT_URL = "http://littlebearz.wap.sh/Hindi/Quiz data 2.0";
-    const LEADERBOARD_URL = "http://littlebearz.wap.sh/Hindi/Leaderboard";
-    let loginAttempts = localStorage.getItem("login_attempts") || 0;
-
-    async function getDeviceID() {
-      return new Promise((resolve) => {
-        let deviceId = localStorage.getItem("device_id");
-        if (!deviceId) {
-          deviceId = Math.random().toString(36).substring(2, 15) + Date.now();
-          localStorage.setItem("device_id", deviceId);
-        }
-        resolve(deviceId);
-      });
-    }
-
-    function getIndianTime() {
-      const options = { timeZone: "Asia/Kolkata", hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" };
-      return new Intl.DateTimeFormat("en-GB", options).format(new Date()).replace(",", "");
-    }
-
-    async function validateLogin(event) {
-      event.preventDefault();
-
-      const userInput = document.getElementById("username").value.trim();
-      const userPassword = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("error-msg");
-      const successMsg = document.getElementById("success-msg");
-      const heading = document.getElementById("login-title");
-      const leaderboardDiv = document.getElementById("leaderboard");
-
-      errorMsg.innerText = "";
-      successMsg.innerText = "";
-
-      if (!userInput || !userPassword) {
-        errorMsg.innerText = "⚠️ Please fill all fields!";
-        return;
-      }
-
-      const apiUrl = "https://api.baserow.io/api/database/rows/table/444317/?user_field_names=true";
-      const apiKey = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw";
-
-      try {
-        const response = await fetch(apiUrl, {
-          headers: {
-            "Authorization": `Token ${apiKey}`,
-            "Content-Type": "application/json"
-          }
-        });
-
-        if (!response.ok) throw new Error("Invalid Data");
-
-        const data = await response.json();
-        const userData = data.results.find(row => row["ID"] == userInput || row["User"] == userInput);
-
-        if (!userData) {
-          errorMsg.innerText = "❌ Username not found!";
-          return;
-        }
-
-        const storedPassword = userData["Oasis"];
-        const registeredDevice = userData["Device"];
-        const userName = userData["Name"];
-        const blockStatus = userData["Block"];
-        const blockMessage = userData["Msg"]; // Get the custom block message
-        const currentDeviceID = await getDeviceID();
-        const currentTime = getIndianTime();
-
-        if (blockStatus === "B") {
-          errorMsg.innerHTML = `🚫 You are blocked!<br>${blockMessage || "No additional message provided."}`;
-          return;
-        }
-
-        if (blockStatus !== "A") {
-          errorMsg.innerText = "❌ Invalid block status!";
-          return;
-        }
-
-        if (userPassword !== storedPassword) {
-          errorMsg.innerText = "❌ Incorrect Password!";
-          return;
-        }
-
-        if (registeredDevice && registeredDevice !== currentDeviceID) {
-          errorMsg.innerText = "🚫 You cannot log in from a different device!";
-          leaderboardDiv.style.display = "block";
-          return;
-        }
-
-        if (!registeredDevice) {
-          await fetch(`https://api.baserow.io/api/database/rows/table/444317/${userData.id}/?user_field_names=true`, {
-            method: "PATCH",
-            headers: {
-              "Authorization": `Token ${apiKey}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ "Device": currentDeviceID, "Time": currentTime })
-          });
-        } else {
-          await fetch(`https://api.baserow.io/api/database/rows/table/444317/${userData.id}/?user_field_names=true`, {
-            method: "PATCH",
-            headers: {
-              "Authorization": `Token ${apiKey}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ "Time": currentTime })
-          });
-        }
-
-        document.title = `Welcome ${userName}`;
-        heading.innerText = `Welcome ${userName}`;
-
-        successMsg.innerText = "✅ Login Successful! Redirecting...";
-        setTimeout(() => {
-          localStorage.clear();
-          sessionStorage.clear();
-          window.location.href = "quiz.html";
-        }, 2000);
-
-      } catch (error) {
-        errorMsg.innerText = "❌ Error fetching data!";
-      }
-
-      loginAttempts++;
-      localStorage.setItem("login_attempts", loginAttempts);
-
-      if (loginAttempts > 0) {
-        leaderboardDiv.style.display = "block";
-      }
-    }
-
-    window.onload = function () {
-      if (loginAttempts > 0) {
-        document.getElementById("leaderboard").style.display = "block";
-      }
-    };
-  </script>
+    <script>function loadIframe(pageUrl) {
+        document.getElementById('mainFrame').src = pageUrl;
+      }</script>
 </head>
+<body oncontextmenu="return false">
+  <header>
+    <div class="logo">HSB Club</div>
+    <div class="menu-toggle" id="menu-toggle">☰</div>
+    <nav id="navbar">
+      <a href="Registration.html">Register</a>
+      <a href="leaderBoard.html">Leaderboard</a>
+      <a href="#blog">Blog</a>
+      <a href="Login.html">Login</a>
+    </nav>
+  </header>
 
-<body>
-  <div style="display:none">
-    <script type="text/javascript">
-      var _qevents = _qevents || [];
-      (function () {
-        var elem = document.createElement('script');
-        elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
-        elem.async = true;
-        elem.type = "text/javascript";
-        var scpt = document.getElementsByTagName('script')[0];
-        scpt.parentNode.insertBefore(elem, scpt);
-      })();
-      _qevents.push({
-        qacct: "p-0cfM8Oh7M9bVQ"
-      });
-    </script>
-    <!-- <noscript>
-      <img src="//pixel.quantserve.com/pixel/p-0cfM8Oh7M9bVQ.gif" border="0" height="1" width="1" alt="" />
-    </noscript> -->
-  </div>
-  <div class="login-container">
-    <h2 id="login-title">🔐Exam Login</h2>
-    <form onsubmit="validateLogin(event)">
-      <label for="username">Username </label>
-      <input type="text" id="username" placeholder="Enter Username">
+  <section class="hero">
+    <h1>Welcome to HSB Club</h1>
+    <p>Join our <span class="highlight">interactive learning community</span> where you can improve your Hindi, engage in daily challenges, and connect with learners just like you! Explore various subjects, challenge yourself, and grow your knowledge every day.</p>
+    <p>Whether you're a beginner or looking to sharpen your skills, HSB Club offers a fun, engaging, and supportive environment to make learning enjoyable and rewarding.</p>
+    <div class="buttons">
+      <a href="Registration.html">Join Now</a>
+      <a href="#rules">View Rules</a>
+    </div>
+    <a href="https://wa.me/+918089423972" class="whatsapp-btn" target="_blank">Join Our WhatsApp Group</a>
+  </section>
 
-      <label for="password">Password </label>
-      <input type="password" id="password" placeholder="Enter your password">
+  <section id="countdown" class="countdown">
+    <p>Next Event Starts In:</p>
+    <div id="timer"></div>
+  </section>
 
-      <button type="submit">Login</button>  
-      <p id="error-msg" class="error"></p>
-      <p id="success-msg" class="success"></p>
-      <div id="leaderboard" class="leaderboard-link">
-        <p>🏆 <a href="leaderBoard.html">Leaderboard</a></p>
+  <section class="quiz-section">
+    <h2>🎯 Test Your Knowledge!</h2>
+    <p>Get started with a fun, quick quiz to see how much you already know. Challenge yourself and see where you stand!</p>
+    <button class="quiz-button" onclick="startQuiz()">Start Quiz</button>
+  </section>
+
+  <section id="rules">
+    <h2>📋 Club Rules & Regulations</h2>
+    <div class="rules">
+      <div class="rule">
+        <h3>1. Respect Everyone</h3>
+        <p>Be kind and respectful to fellow learners. No abusive language or hate speech allowed.</p>
       </div>
-    </form>
-    <button onclick="document.location='leaderBoard.html'">Leaderboard</button>
-  </div>
-  <!-- <style type="text/css">
-    html {
-      padding-top: 26px;
+      <div class="rule">
+        <h3>2. Complete Tasks Daily</h3>
+        <p>Complete the given daily challenge in 20 minutes to stay on track and earn points.</p>
+      </div>
+      <div class="rule">
+        <h3>3. No Copying or Cheating</h3>
+        <p>All answers and translations must be your own. This is a learning space, not a competition.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="benefits">
+    <div class="benefit">
+      <h3>Learn at Your Own Pace</h3>
+      <p>Our tasks are designed to fit into your busy schedule. No pressure – just fun learning!</p>
+    </div>
+    <div class="benefit">
+      <h3>Build a Supportive Network</h3>
+      <p>Engage with like-minded learners. Share ideas, solve problems, and grow together.</p>
+    </div>
+    <div class="benefit">
+      <h3>Challenge Yourself</h3>
+      <p>Daily challenges to improve your Hindi skills and other subjects. Track your progress!</p>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 HSB Club – Built with ❤️ for students. Join us on WhatsApp.
+  </footer>
+
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.getElementById('navbar').classList.toggle('active');
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        e.preventDefault();
+      }
+    });
+
+    function startQuiz() {
+      alert("The quiz feature is coming soon! Stay tuned for more.");
     }
 
-    #xt_auth_iframe {
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: transparent;
+    // Countdown Timer Functionality
+    function updateCountdown() {
+      const endTime = new Date("2025-05-30T19:00:00Z");
+      const now = new Date();
+      const remainingTime = endTime - now;
+      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+      
+      document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
-  </style><iframe id="xt_auth_iframe" allowTransparency="true" scrolling="no" frameBorder="0"
-    style="width: 100%; border: 0; height: 26px;"
-    src="https://xtgem.com/__xt_authbar?data=eyJ1cmwiOiJodHRwOlwvXC9saXR0bGViZWFyei53YXAuc2hcL0hpbmRpXC9EYXRhIGJhc2UiLCJsb2dnZWRfaW4iOmZhbHNlLCJkb21haW4iOiJsaXR0bGViZWFyei53YXAuc2giLCJwb3NpdGlvbiI6eyJhYnNvbHV0ZSI6ImZpeGVkIn19"></iframe><br /><!----><noscript></noscript>
-  <script type="text/javascript"></script><textarea style="display:none;"></textarea>
-  <style></style><iframe style="display:none;width:0px;height:0px;border:0"></iframe>
-  <noframes></noframes>
-  <div id="st1746344482" style="z-index:999999;z-index:999999999;"><span id="a1746344482">
-       
-        </span>
-    <style type="text/css">
-      #st1746344482 * {
-        box-sizing: content-box !important;
-      }
 
-      #st1746344482 a {
-        display: inline-block !important;
-        vertical-align: top;
-        padding: 0;
-        margin: 0;
-      }
-
-      #st1746344482 a img {
-        display: inline-block !important;
-      }
-
-      #st1746344482 ._xt_ad_close,
-      #st1746344482 ._xt_ad_close_internal {
-        display: inline-block !important;
-        position: absolute !important;
-        right: 6px !important;
-        width: 20px !important;
-        height: 20px !important;
-        cursor: pointer;
-      }
-
-      /* #st1746344482 ._xt_ad_close {
-        top: -10px !important;
-      } */
-
-      #st1746344482 ._xt_ad_close_internal {
-        border: 6px solid transparent;
-        top: -12px !important;
-        right: 3px !important;
-      }
-
-      #a1746344482 {
-        display: inline-block !important;
-        position: relative !important;
-        text-align: left !important;
-        visibility: visible !important;
-        max-width: 100% !important;
-        max-height: none !important;
-        z-index: 999999 !important;
-        z-index: 999999999 !important;
-      }
-
-      #a1746344482 img {
-        max-width: none !important;
-        max-height: none !important;
-        width: auto !important;
-        height: auto !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-      }
-
-      .fba1746344482 {
-        color: #1D1EEB !important;
-        background-color: #fff !important;
-        padding: 10px 50px 10px 10px !important;
-        border: 1px solid #2C2C2C !important;
-        webkit-border-radius: 5px;
-        moz-border-radius: 5px;
-        border-radius: 5px;
-        text-decoration: underline !important;
-        font-weight: bold !important;
-        display: block !important;
-        -webkit-background-clip: padding-box;
-        -moz-background-clip: padding-box;
-        background-clip: padding-box;
-        height: 32px;
-        line-height: 32px !important;
-        background-image: url(//xtgem.com/images/arrow.gif) !important;
-        background-repeat: no-repeat !important;
-        background-position: 95% center !important;
-      }
-
-      .fbp1746344482 {
-        position: relative !important;
-        display: block !important;
-        width: 320px !important;
-        height: 50px !important;
-        text-align: left !important;
-        background-color: #fff !important;
-        -moz-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.2);
-        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.2);
-        padding: 3px !important;
-        border-radius: 3px !important;
-        border: 1px solid #6bc135 !important;
-        text-decoration: underline !important;
-      }
-
-      .fbp_txt1746344482 {
-        position: relative !important;
-        display: inline-block !important;
-        min-width: 200px;
-        max-width: 200px;
-        height: 50px !important;
-        vertical-align: top !important;
-        line-height: 50px !important;
-        margin-left: 6px !important;
-        text-align: left !important;
-        color: #0274d4 !important;
-        font-family: Helvetica, Arial, sans-serif !important;
-        font-size: 13px !important;
-        font-weight: bold !important;
-        text-decoration: underline !important;
-      }
-
-      .fbp_ico1746344482 {
-        position: absolute !important;
-        right: 10px !important;
-        height: 50px !important;
-        line-height: 46px !important;
-        vertical-align: top !important;
-        color: #6bc135 !important;
-      }
-
-      #st1746344482 .rolling_ad {
-        display: none !important;
-      }
-
-      #st1746344482 .rolling_ad.roll_on {
-        display: inline-block !important;
-      }
-    </style>
-  </div><noscript></noscript>
-  <script type="text/javascript"></script><textarea style="display:none;"></textarea>
-  <style></style><iframe style="display:none;width:0px;height:0px;border:0"></iframe>
-  <noframes></noframes>
-  <script type="text/javascript" id="xtjs">                (function () {
-
-      var d, b, ad_pos = false, el_rolling_ads, html, el, el_inner, el_new = '', i = 0;
-
-      function xt_cache() {
-        d = document;
-        b = d.getElementsByTagName('body')[0];
-        html = d.documentElement;
-        el = d.getElementById('st1746344482');
-        el_inner = d.getElementById('a1746344482');
-        el_rolling_ads = el.getElementsByClassName('rolling_ad');
-      }
-
-      xt_cache();
-
-      if (el.children[0] !== el_inner && el.children[0].tagName == "A") {
-
-        for (i = 1; i < el.children.length; i++) {
-          el_new += el.children[i].outerHTML;
-        }
-
-        el.innerHTML = el_inner.outerHTML.split('>')[0] + '>' + el_new + '</span>';
-
-        xt_cache();
-      }
-      else if (el.offsetParent === null) {
-        b.insertBefore(el, b.firstChild);
-
-        xt_cache();
-        ad_pos = true;
-      }
-
-      if (d.getElementById('kosmos-banner')) {
-        ad_pos = true;
-      }
-
-      el.style.display = "block";
-      el.style.textAlign = "center";
-      el.style.position = "fixed";
-      if (ad_pos) { el.style.top = 10 + "px"; el.style.bottom = 'auto'; } else { el.style.bottom = 10 + "px"; }
-      el.style.left = "0";
-      el.style.right = "0";
-      el.style.height = "1px";
-
-      var el_imgs = el.getElementsByTagName('IMG');
-      for (i = 0, len = el_imgs.length; i < len; i++) { el_imgs[i].onload = fix_height; }
-
-      function fix_height() {
-        el.style.marginBottom = el_inner.offsetHeight + "px";
-        if (ad_pos) {
-          html.style.paddingTop = el_inner.offsetHeight + 9 + "px";
-        } else {
-          html.style.paddingBottom = el_inner.offsetHeight + 9 + "px";
-        }
-      }
-
-      setTimeout(function () { fix_height(); }, 200);
-
-      var closebutton = d.createElement('IMG');
-      closebutton.src = '//xtgem.com/images/close2.png?v=0.01';
-      closebutton.alt = '[x]';
-      closebutton.setAttribute('class', '_xt_ad_close');
-      closebutton.onclick = function () { closebutton.setAttribute('style', 'display: none !important'); el.style.position = 'static'; closebutton.onclick = null; html.style.paddingBottom = '0'; html.style.paddingTop = '0'; if (d.getElementById('wr1746344482')) { d.getElementById('wr1746344482').style.bottom = '0'; } };
-      el_inner.appendChild(closebutton);
-
-      // lets roll ads if needed
-      if (el_rolling_ads) {
-        function roll_ads() {
-          var i = 0,
-            len = el_rolling_ads.length,
-            curr_ad,
-            next_ad,
-            first_ad = el_rolling_ads[0];
-
-          for (; i < len; i++) {
-            curr_ad = el_rolling_ads[i];
-            next_ad = el_rolling_ads[i + 1] ? el_rolling_ads[i + 1] : first_ad;
-
-            if (curr_ad.className.indexOf(' roll_on') !== -1) {
-              curr_ad.className = curr_ad.className.replace(' roll_on', '');
-              next_ad.className = next_ad.className + ' roll_on';
-              break;
-            }
-          }
-          setTimeout(roll_ads, 3500);
-        }
-        roll_ads();
-      }
-    }());</script>
+    setInterval(updateCountdown, 1000);
+  </script>
 </body>
-
 </html>
