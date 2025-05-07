@@ -101,8 +101,8 @@
     }
   </style>
   <script>
-    const REDIRECT_URL = "http://littlebearz.wap.sh/Hindi/Quiz data 2.0";
-    const LEADERBOARD_URL = "http://littlebearz.wap.sh/Hindi/Leaderboard";
+    const REDIRECT_URL = "/quiz.html";
+    const LEADERBOARD_URL = "/leaderBoard.html";
     let loginAttempts = localStorage.getItem("login_attempts") || 0;
 
     async function getDeviceID() {
@@ -240,24 +240,6 @@
 </head>
 
 <body>
-  <div style="display:none">
-    <script type="text/javascript">
-      var _qevents = _qevents || [];
-      (function () {
-        var elem = document.createElement('script');
-        elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
-        elem.async = true;
-        elem.type = "text/javascript";
-        var scpt = document.getElementsByTagName('script')[0];
-        scpt.parentNode.insertBefore(elem, scpt);
-      })();
-      _qevents.push({
-        qacct: "p-0cfM8Oh7M9bVQ"
-      });
-    </script>
-    <!-- <noscript>
-      <img src="//pixel.quantserve.com/pixel/p-0cfM8Oh7M9bVQ.gif" border="0" height="1" width="1" alt="" />
-    </noscript> -->
   </div>
   <div class="login-container">
     <h2 id="login-title">🔐Exam Login</h2>
@@ -275,7 +257,7 @@
         <p>🏆 <a href="leaderBoard.html">Leaderboard</a></p>
       </div>
     </form>
-    <button onclick="document.location='leaderBoard.html'">Leaderboard</button>
+    <button onclick="document.location='Registration.html'">Sign Up</button>
   </div>
   <!-- <style type="text/css">
     html {
