@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Chemistry Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: #eef1f6;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    h2 {
+      text-align: center;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+    #studentInfo {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #475569;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 12px 10px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 15px;
+    }
+    th {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    .print-btn {
+      text-align: center;
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      table th, table td {
+        font-size: 14px;
+        padding: 10px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Chemistry Report Card</h2>
+    <div id="studentInfo">Loading...</div>
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th>Exam</th>
+          <th>Date</th>
+          <th>Mark</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="print-btn">
+      <button onclick="window.print()">🖨️ Print Report</button>
+    </div>
+  </div>
+
+  <script>
+    const apiKey = "jXXkrUUqrQK3RlESaDPs2gq0Eu0SK4Sw"; // Replace this
+    const tableId = "614054";       // Replace this
+    const baseUrl = "https://api.baserow.io/api/database/rows/table/";
+    const params = new URLSearchParams(window.location.search);
+    const studentId = params.get("id");
+
+    function calculateGrade(mark) {
+      mark = parseFloat(mark);
+      if (isNaN(mark)) return "-";
+      if (mark >= 90) return "A+";
+      if (mark >= 80) return "A";
+      if (mark >= 70) return "B+";
+      if (mark >= 60) return "B";
+      if (mark >= 50) return "C+";
+      if (mark >= 40) return "C";
+      if (mark >= 30) return "D+";
+      return "Failed";
+    }
+
+    async function loadData() {
+  try {
+    const response = await fetch(`${baseUrl}${tableId}/?user_field_names=true`, {
+      headers: { Authorization: `Token ${apiKey}` }
+    });
+
+    const data = await response.json();
+    const student = data.results.find(row => row["ID Number"] == studentId);
+
+    if (!student) {
+      document.body.innerHTML = "<h2 style='text-align:center;'>Student not found ❌</h2>";
+      return;
+    }
+
+    const studentClassRaw = student.Class || "";
+    const studentClass = studentClassRaw.match(/\d+/)?.[0]; // Extract numeric class like '10' from '10A'
+
+    document.getElementById("studentInfo").innerHTML =
+      `<strong>Name:</strong> ${student.Name} &nbsp; | 
+       <strong>ID:</strong> ${student["ID Number"]} &nbsp; | 
+       <strong>Class:</strong> ${studentClassRaw || "-"}`;
+
+    const tableBody = document.querySelector("#reportTable tbody");
+
+    for (const key in student) {
+      // Match: Exam Name | Topic (YYYY-MM-DD)[MAX_MARK]{CLASS}
+      const match = key.match(/^(.+?)\s*\|\s*(.+)\s*\((\d{4}-\d{2}-\d{2})\)\[(\d+)\]\{(\d+)\}$/);
+      if (match) {
+        const examName = match[1].trim();
+        const topic = match[2].trim();
+        const [yyyy, mm, dd] = match[3].split("-");
+        const date = `${dd}/${mm}/${yyyy}`;
+        const maxMark = parseFloat(match[4]);
+        const examClass = match[5]; // e.g., '10'
+
+        // ❌ Skip if class doesn't match
+        if (studentClass !== examClass) continue;
+
+        const studentMark = parseFloat(student[key]);
+        if (isNaN(studentMark)) continue;
+
+        const percentage = (studentMark / maxMark) * 100;
+        const grade = calculateGrade(percentage);
+
+        tableBody.innerHTML += `
+          <tr>
+            <td>
+              <strong>${examName}</strong><br/>
+              <small style="color:#555;">Topic: ${topic}</small><br/>
+              <small style="color:gray;">Max: ${maxMark}</small>
+            </td>
+            <td>${date}</td>
+            <td>${studentMark}</td>
+            <td>${grade}</td>
+          </tr>`;
+      }
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    document.body.innerHTML = "<h2>Error loading report 😥</h2>";
+  }
+}
+
+
+    loadData();
+  </script>
+</body>
+</html>
